@@ -1,0 +1,534 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile - MCS</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #fd7e14;
+        --dark-orange: #e06c0c;
+        --sidebar-bg: #fff3e6;
+        --sidebar-active: #fd7e14;
+        --sidebar-link: #fd7e14;
+        --sidebar-link-hover: #ffe0b3;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Navbar Styles */
+      .navbar {
+        background-color: var(--primary-color) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-brand img {
+        height: 40px;
+      }
+
+      /* Card Styles */
+      .card {
+        border: 1px solid rgba(253, 126, 20, 0.1);
+        box-shadow: 0 4px 12px rgba(253, 126, 20, 0.08);
+        transition: all 0.3s ease;
+      }
+
+      .card:hover {
+        box-shadow: 0 6px 16px rgba(253, 126, 20, 0.12);
+        transform: translateY(-2px);
+      }
+
+      .card-header {
+        background: linear-gradient(135deg, #ffffff 0%, #fff3e6 100%);
+        border-bottom: 2px solid var(--primary-color);
+        padding: 1.25rem 1.5rem;
+      }
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      /* Button Styles */
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--dark-orange);
+        border-color: var(--dark-orange);
+      }
+
+      .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      /* Footer */
+      .footer {
+        background-color: var(--dark-orange);
+        color: white;
+        margin-top: auto;
+        padding: 1rem 0;
+      }
+
+      .footer a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* Profile Picture */
+      .profile-picture {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 3px solid var(--primary-color);
+      }
+
+      /* Avatar Placeholder */
+      .profile-picture.rounded-circle {
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid var(--primary-color);
+      }
+
+      .profile-picture.rounded-circle i {
+        font-size: 3rem;
+      }
+
+      /* List Styles */
+      .list-unstyled li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .list-unstyled li:last-child {
+        border-bottom: none;
+      }
+
+      /* Badge Styles */
+      .badge {
+        padding: 0.5em 1em;
+        font-weight: 500;
+      }
+
+      .badge.bg-success {
+        background-color: #28a745 !important;
+      }
+
+      /* Modern Info Item Styles */
+      .info-item {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 12px;
+        padding: 1.25rem;
+        border: 1px solid rgba(253, 126, 20, 0.1);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .info-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(253, 126, 20, 0.15);
+        border-color: rgba(253, 126, 20, 0.2);
+      }
+
+      .info-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+      }
+
+      .info-value {
+        font-size: 1.1rem;
+        color: #212529;
+        font-weight: 500;
+        word-break: break-word;
+      }
+
+      .info-value .badge {
+        font-size: 0.8rem;
+        padding: 0.4em 0.8em;
+      }
+
+      /* Project Badges */
+      .project-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .project-badges .badge {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--dark-orange) 100%
+        );
+        border: none;
+        font-weight: 500;
+        padding: 0.6em 1em;
+        border-radius: 20px;
+        box-shadow: 0 2px 4px rgba(253, 126, 20, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .project-badges .badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .info-item {
+          padding: 1rem;
+        }
+
+        .info-value {
+          font-size: 1rem;
+        }
+
+        .project-badges {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+          <img
+            src="{% static 'tgfs/images/tgfs.png' %}"
+            alt="MCS Logo"
+            height="40"
+          />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <div class="navbar-nav">
+            <div class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-light"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="{% url 'profile_view' %}">
+                    <i class="fas fa-user me-2"></i>Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'home' %}">
+                    <i class="fas fa-home me-2"></i>Home
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form
+                    action="{% url 'logout' %}"
+                    method="post"
+                    class="d-inline"
+                  >
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+      <!-- Profile Header -->
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  {% if profile.profile_picture %}
+                  <img
+                    src="{{ profile.profile_picture.url }}"
+                    alt="Profile Picture"
+                    class="profile-picture rounded-circle"
+                  />
+                  {% else %}
+                  <div
+                    class="profile-picture rounded-circle d-flex align-items-center justify-content-center bg-primary text-white"
+                  >
+                    <i class="fas fa-user fa-2x"></i>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="flex-grow-1 ms-4">
+                  <h2 class="mb-1">
+                    {{ profile.full_name|default:user.username }}
+                  </h2>
+                  <p class="text-muted mb-2">@{{ user.username }}</p>
+                  <p class="mb-3">{{ profile.bio|default:"No bio yet." }}</p>
+                  <a href="#" class="btn btn-primary">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Details -->
+      <div class="row">
+        <!-- Account Information -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-id-card me-2 text-primary"></i>Account
+              Information
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-hashtag me-2 text-primary"></i>Account
+                    Number
+                  </div>
+                  <div class="info-value">{{ account_number }}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-user me-2 text-primary"></i>Full Name
+                  </div>
+                  <div class="info-value">
+                    {{ profile.full_name|default:"Not provided" }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-at me-2 text-primary"></i>Username
+                  </div>
+                  <div class="info-value">{{ user.username }}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-calendar-plus me-2 text-primary"></i>Member
+                    Since
+                  </div>
+                  <div class="info-value">
+                    {{ user.date_joined|date:"F j, Y" }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-clock me-2 text-primary"></i>Last Login
+                  </div>
+                  <div class="info-value">
+                    {{ user.last_login|date:"F j, Y g:i A"|default:"Never" }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-check-circle me-2 text-primary"></i>Account
+                    Status
+                  </div>
+                  <div class="info-value">
+                    <span class="badge bg-success">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project Access -->
+            <div class="mt-4">
+              <div class="info-label mb-3">
+                <i class="fas fa-project-diagram me-2 text-primary"></i>Project
+                Access
+              </div>
+              {% if user_projects %}
+              <div class="project-badges">
+                {% for project in user_projects %}
+                <span class="badge bg-primary me-2 mb-2"
+                  >{{ project.name }}</span
+                >
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="info-value text-muted">
+                <i class="fas fa-info-circle me-1"></i>No project access
+                assigned yet
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-user-circle me-2 text-primary"></i>Personal
+              Information
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-envelope me-2 text-primary"></i>Email
+                    Address
+                  </div>
+                  <div class="info-value">
+                    {{ user.email|default:"Not provided" }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-phone me-2 text-primary"></i>Phone Number
+                  </div>
+                  <div class="info-value">
+                    {{ profile.phone_number|default:"Not provided" }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-id-badge me-2 text-primary"></i>National ID
+                  </div>
+                  <div class="info-value">
+                    {{ profile.national_id|default:"Not provided" }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-birthday-cake me-2 text-primary"></i>Date
+                    of Birth
+                  </div>
+                  <div class="info-value">
+                    {{ profile.date_of_birth|date:"F j, Y"|default:"Not
+                    provided" }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-map-marker-alt me-2 text-primary"></i
+                    >Address
+                  </div>
+                  <div class="info-value">
+                    {{ profile.address|default:"Not provided" }}
+                  </div>
+                </div>
+              </div>
+              {% if profile.bio %}
+              <div class="col-12">
+                <div class="info-item mb-3">
+                  <div class="info-label">
+                    <i class="fas fa-quote-left me-2 text-primary"></i>Bio
+                  </div>
+                  <div class="info-value">{{ profile.bio }}</div>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="mb-0">
+              &copy; 2024 Mushana Multipurpose Cooperative Society. All rights
+              reserved.
+            </p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#" class="me-3">Privacy Policy</a>
+            <a href="#">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

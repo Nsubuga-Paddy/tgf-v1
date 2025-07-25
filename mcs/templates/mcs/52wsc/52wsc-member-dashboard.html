@@ -1,0 +1,562 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="theme-color" content="#ff6b00" />
+    <title>MCS-TGFS Dashboard</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- DataTables CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
+    />
+
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet" />
+
+    <style>
+      :root {
+        --primary-color: #fd7e14;
+        --sidebar-bg: #fff3e6;
+        --sidebar-active: #fd7e14;
+        --sidebar-link: #fd7e14;
+        --sidebar-link-hover: #ffe0b3;
+      }
+
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .navbar {
+        background-color: var(--primary-color) !important;
+      }
+
+      .btn-light-orange {
+        background-color: #ffd699;
+        border-color: #ffd699;
+        color: #000;
+      }
+      .btn-light-orange:hover {
+        background-color: #ffc266;
+        border-color: #ffc266;
+        color: #000;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: var(--sidebar-bg);
+        padding-top: 60px;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .sidebar.collapsed {
+        left: -250px;
+      }
+
+      .sidebar .nav-link {
+        color: var(--primary-color);
+        padding: 0.8rem 1rem;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        margin: 0.2rem 0.5rem;
+        font-weight: 500;
+      }
+
+      .sidebar .nav-link:hover {
+        background-color: var(--sidebar-link-hover);
+        color: var(--primary-color);
+      }
+
+      .sidebar .nav-link.active {
+        background-color: var(--sidebar-active);
+        color: #fff;
+      }
+
+      .sidebar .nav-link i {
+        width: 25px;
+        text-align: center;
+        margin-right: 10px;
+      }
+
+      /* Main Content Adjustment */
+      .main-content {
+        margin-left: 250px;
+        transition: all 0.3s ease;
+        width: calc(100% - 250px);
+      }
+
+      .main-content.expanded {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      /* Toggle Button */
+      .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1100;
+        background-color: var(--primary-color);
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: block;
+      }
+
+      .sidebar-toggle:hover {
+        background-color: #e06c0c;
+      }
+
+      @media (min-width: 992px) {
+        .sidebar-toggle {
+          display: none;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .sidebar {
+          left: -250px;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
+
+      /* Dropdown Styles */
+      .dropdown-menu {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      .dropdown-item {
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-item:hover {
+        background-color: #fff3e6;
+        color: var(--primary-color);
+      }
+
+      .dropdown-item.text-danger:hover {
+        background-color: #fee2e2;
+        color: #dc3545;
+      }
+
+      .dropdown-divider {
+        margin: 0.5rem 0;
+        border-color: #f0f0f0;
+      }
+
+      .nav-link.dropdown-toggle::after {
+        margin-left: 0.5rem;
+      }
+    </style>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  </head>
+
+  <body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container-fluid">
+        <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand" href="{% url 'home' %}">
+          <img
+            src="{% static 'tgfs/images/tgfs.png' %}"
+            alt="MCS Logo"
+            height="40"
+          />
+        </a>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <div class="navbar-nav">
+            <div class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-light"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="{% url 'profile_view' %}">
+                    <i class="fas fa-user me-2"></i>Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'home' %}">
+                    <i class="fas fa-home me-2"></i>Home
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form
+                    action="{% url 'logout' %}"
+                    method="post"
+                    class="d-inline"
+                  >
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="d-flex flex-column h-100">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a
+              class="nav-link {% if request.resolver_match.url_name == 'wsc_member_dashboard' %}active{% endif %}"
+              href="{% url 'wsc_member_dashboard' %}"
+            >
+              <i class="fas fa-user"></i>My 52WSC Savings
+            </a>
+          </li>
+          <li class="nav-item mt-auto">
+            <a class="nav-link" href="{% url 'home' %}">
+              <i class="fas fa-home"></i>Back to Home
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <div class="container-fluid px-4">
+        <!-- Title Section -->
+        <div
+          class="d-flex align-items-center mb-4 pb-2"
+          style="border-bottom: 3px solid #ff6b00"
+        >
+          <div>
+            <h2 class="mb-0 fw-bold">
+              {{ first_name }}'s
+              <span style="color: #ff6b00">52 WSC</span> Dashboard
+            </h2>
+            <p class="text-muted mb-0 mt-1">
+              <i class="fas fa-chart-line me-2"></i>Tracking your savings
+              progress and investments
+            </p>
+          </div>
+          <div class="ms-auto text-end">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <small class="text-muted d-block">Account Number:</small>
+                <span class="fw-bold" style="color: #ff6b00"
+                  >{{ account_number }}</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overview Cards -->
+        <div class="row g-3 my-2">
+          <!-- Total Savings -->
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Total Savings</h6>
+                <h3 class="card-title" id="personalSavings">
+                  UGX {{ savings_data.total_saved|floatformat:0 }}
+                </h3>
+                <small class="text-muted">
+                  Target: UGX {% if savings_data.target_amount %}{{ savings_data.target_amount|floatformat:0 }}{% else %} 13,780,000 {% endif %}
+                </small>
+                <div class="progress mt-2" style="height: 5px">
+                  <div
+                    class="progress-bar"
+                    id="savingsProgress"
+                    style="width: {{ savings_data.progress_percentage }}%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Balance Forward -->
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Balance Forward</h6>
+                <h3 class="card-title mb-3">
+                  UGX {{ savings_data.carry_forward|floatformat:0 }}
+                </h3>
+                <h3 class="card-title text-success" style="font-size: 0.875rem">
+                  Next Week to Cover: Week {{ savings_data.current_week }}
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Amount Invested -->
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Amount Invested</h6>
+                <h3 class="card-title">
+                  UGX {{ investment_summary.total_invested|floatformat:0 }}
+                </h3>
+                <small class="text-muted">
+                  Uninvested Amount: UGX {% if investment_summary.available_balance %}{{ investment_summary.available_balance|floatformat:0 }}{% else %}0{% endif %}
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interest to be Earned -->
+          <div class="col-md-3">
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">
+                  Interest to be Earned
+                </h6>
+                <h3 class="card-title">
+                  UGX {{ investment_summary.interest_expected|floatformat:0 }}
+                </h3>
+                <small class="text-muted">
+                  Interest Earned: UGX {% if investment_summary.interest_gained %}{{ investment_summary.interest_gained|floatformat:0 }}{% else %}0{% endif %}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Investment Terms Alert -->
+        <div class="alert alert-info mt-4" role="alert">
+          <h5 class="alert-heading">
+            <i class="fas fa-info-circle me-2"></i>Investment Terms
+          </h5>
+          <p class="mb-0">
+            Your savings are automatically invested at a
+            <strong>30% interest rate</strong> over an
+            <strong>8-month period</strong> from the date of investment.
+            <br />
+            Interest is paid at maturity.
+          </p>
+        </div>
+
+        <!-- Investment History Table -->
+        <div class="card mt-4">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <span>My Investment History</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Date Invested</th>
+                    <th>Amount</th>
+                    <th>Interest Rate</th>
+                    <th>Interest Earned</th>
+                    <th>Expected Interest</th>
+                    <th>Maturity Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if investments %} {% for investment in investments %}
+                  <tr>
+                    <td>{{ investment.date }}</td>
+                    <td>UGX {{ investment.amount|floatformat:0 }}</td>
+                    <td>{{ investment.rate }}%</td>
+                    <td>UGX {{ investment.interest_so_far|floatformat:0 }}</td>
+                    <td>
+                      UGX {{ investment.expected_interest|floatformat:0 }}
+                    </td>
+                    <td>{{ investment.maturity_date }}</td>
+                    <td>
+                      {% if investment.status == 'active' %}
+                      <span class="badge bg-success">Active</span>
+                      {% elif investment.status == 'matured' %}
+                      <span class="badge bg-info">Matured</span>
+                      {% elif investment.status == 'pending' %}
+                      <span class="badge bg-warning">Pending</span>
+                      {% else %}
+                      <span class="badge bg-danger">Cancelled</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %} {% else %}
+                  <tr>
+                    <td colspan="7" class="text-center">
+                      No investments found
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings History Table -->
+        <div class="card mt-4">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <span>My Savings History</span>
+            <a href="download_savings.html" class="btn btn-sm btn-primary">
+              <i class="fas fa-download me-1"></i> Download Savings Data
+            </a>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover" id="savingsHistoryTable">
+                <thead>
+                  <tr>
+                    <th>Date Saved</th>
+                    <th>Amount Deposited</th>
+                    <th>Cumulative Total</th>
+                    <th>Weeks Fully Covered</th>
+                    <th>Receipt N.O</th>
+                    <th>Balance Forward</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if transactions %} {% for transaction in transactions %}
+                  <tr>
+                    <td>{{ transaction.date_saved }}</td>
+                    <td>UGX {{ transaction.amount|floatformat:0 }}</td>
+                    <td>
+                      UGX {{ transaction.cumulative_total|floatformat:0 }}
+                    </td>
+                    <td>{{ transaction.weeks_covered }}</td>
+                    <td>{{ transaction.receipt_number }}</td>
+                    <td>
+                      UGX {{ transaction.remaining_balance|floatformat:0 }}
+                    </td>
+                  </tr>
+                  {% endfor %} {% else %}
+                  <tr>
+                    <td colspan="6" class="text-center">
+                      No savings transactions found
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            $("#savingsHistoryTable").DataTable({
+              pageLength: 10,
+              lengthChange: false,
+              ordering: false,
+              searching: false,
+              info: false,
+              paging: false,
+            });
+          });
+        </script>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Make member data available to JS -->
+    <script>
+      window.memberData = {{ member_data_json|safe }};
+    </script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("sidebar");
+        const mainContent = document.getElementById("mainContent");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+
+        // Toggle sidebar on button click
+        sidebarToggle.addEventListener("click", function () {
+          sidebar.classList.toggle("show");
+        });
+
+        // Handle window resize
+        window.addEventListener("resize", function () {
+          if (window.innerWidth > 992) {
+            sidebar.classList.remove("show");
+          }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener("click", function (event) {
+          if (window.innerWidth <= 992) {
+            if (
+              !sidebar.contains(event.target) &&
+              !sidebarToggle.contains(event.target)
+            ) {
+              sidebar.classList.remove("show");
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

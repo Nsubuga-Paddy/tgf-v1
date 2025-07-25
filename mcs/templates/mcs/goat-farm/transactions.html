@@ -1,0 +1,325 @@
+{% extends 'mcs/goat-farm/base.html' %}
+
+{% block title %}Transactions - Goat Farm{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Transactions</h1>
+        <div>
+            <a href="{% url 'goat_farm_dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Transaction Summary -->
+    <div class="row g-4 mb-4">
+        <!-- Total Investments -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card bg-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Investments</h6>
+                            <h2 class="card-title mb-0">UGX {{ total_investments|floatformat:0 }}</h2>
+                        </div>
+                        <div class="icon text-primary">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                    </div>
+                    <p class="card-text mt-3 mb-0">
+                        <small class="text-muted">{{ investment_count }} investment{{ investment_count|pluralize }} made</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Pending payments -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card bg-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Pending Payments`</h6>
+                            <h2 class="card-title mb-0">UGX {{ total_pending_amount|floatformat:0 }}</h2>
+                        </div>
+                        <div class="icon text-primary">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                    </div>
+                    <p class="card-text mt-3 mb-0">
+                        <small class="text-muted">
+                            Total: UGX {{ total_package_amounts|floatformat:0 }} <br> Paid: UGX {{ total_investments|floatformat:0 }}
+                          </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Returns Calculator -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card bg-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Returns Calculator</h6>
+                            <h2 class="card-title mb-0" id="totalValue">UGX 0</h2>
+                        </div>
+                        <div class="icon text-primary">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                    </div>
+                    
+                    <form id="returnsCalculator">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small">Number of Goats</label>
+                                <input type="number" class="form-control form-control-sm" id="nGoats" value="2" min="1" max="20">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small">Years</label>
+                                <input type="number" class="form-control form-control-sm" id="years" value="1" min="1" max="5">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <div id="calculationDetails">
+                                    Estimated kids: <span id="totalKids">0</span><br>
+                                    Market value: <span id="marketValue">UGX 0</span>
+                                </div>
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Transaction Type</label>
+                    <select name="type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="investment" {% if filter_type == 'investment' %}selected{% endif %}>Investments</option>
+                        <option value="fee" {% if filter_type == 'fee' %}selected{% endif %}>Management Fees</option>
+                        <option value="return" {% if filter_type == 'return' %}selected{% endif %}>Returns</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="completed" {% if filter_status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="failed" {% if filter_status == 'failed' %}selected{% endif %}>Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Date Range</label>
+                    <div class="input-group">
+                        <input type="date" name="start_date" class="form-control" value="{{ filter_start_date }}">
+                        <span class="input-group-text">to</span>
+                        <input type="date" name="end_date" class="form-control" value="{{ filter_end_date }}">
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-2"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transactions List -->
+    <div class="card bg-white">
+        <div class="card-header bg-transparent">
+            <h5 class="card-title mb-0">Transaction History</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Receipt No.</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if transactions %}
+                            {% for transaction in transactions %}
+                                <tr style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#transactionModal" data-transaction-id="{{ transaction.id }}">
+                                    <td>{{ transaction.date }}</td>
+                                    <td>{{ transaction.receipt_no }}</td>
+                                    <td><span class="badge {{ transaction.type_badge_class }}">{{ transaction.type }}</span></td>
+                                    <td>{{ transaction.description }}</td>
+                                    <td>UGX {{ transaction.amount|floatformat:0 }}</td>
+                                    <td><span class="badge {{ transaction.status_badge_class }}">{{ transaction.status }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4">
+                                    <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+                                    <p class="text-muted">No transactions found matching your criteria.</p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Details Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Transaction Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="transactionDetails">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Returns Calculator
+    const returnsCalculator = document.getElementById('returnsCalculator');
+    if (returnsCalculator) {
+        const nGoatsInput = document.getElementById('nGoats');
+        const yearsInput = document.getElementById('years');
+        const totalValueSpan = document.getElementById('totalValue');
+        const totalKidsSpan = document.getElementById('totalKids');
+        const marketValueSpan = document.getElementById('marketValue');
+        
+        const KIDS_PER_GOAT_PER_YEAR = 3;
+        const MARKET_PRICE_PER_KID = 400000;
+        
+        function calculateReturns() {
+            const nGoats = parseInt(nGoatsInput.value) || 0;
+            const years = parseInt(yearsInput.value) || 0;
+            
+            const totalKids = nGoats * KIDS_PER_GOAT_PER_YEAR * years;
+            const totalValue = totalKids * MARKET_PRICE_PER_KID;
+            
+            totalKidsSpan.textContent = totalKids;
+            marketValueSpan.textContent = 'UGX ' + totalValue.toLocaleString();
+            totalValueSpan.textContent = 'UGX ' + totalValue.toLocaleString();
+        }
+        
+        // Calculate on input change
+        nGoatsInput.addEventListener('input', calculateReturns);
+        yearsInput.addEventListener('input', calculateReturns);
+        
+        // Initial calculation
+        calculateReturns();
+    }
+    
+    // Handle transaction details modal
+    const transactionModal = document.getElementById('transactionModal');
+    if (transactionModal) {
+        transactionModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const transactionId = button.getAttribute('data-transaction-id');
+            
+            // Load transaction details
+            fetch(`/goat-farm/transactions/${transactionId}/details/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('transactionDetails').innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Transaction Information</h6>
+                                <table class="table">
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <td>${data.id}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date</th>
+                                        <td>${data.date}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Type</th>
+                                        <td><span class="badge bg-${data.type_color}">${data.type}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Status</th>
+                                        <td><span class="badge bg-${data.status_color}">${data.status}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Amount</th>
+                                        <td>${data.amount ? 'UGX ' + Number(data.amount).toLocaleString() : data.goats + ' goats'}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Payment Details</h6>
+                                <table class="table">
+                                    <tr>
+                                        <th>Payment Method</th>
+                                        <td>${data.payment_method || '-'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Reference</th>
+                                        <td>${data.reference || '-'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Processed By</th>
+                                        <td>${data.processed_by || '-'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Processed Date</th>
+                                        <td>${data.processed_date || '-'}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="mb-3">Additional Information</h6>
+                                <p class="mb-0">${data.description}</p>
+                                ${data.notes ? `
+                                    <div class="alert alert-info mt-3">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        ${data.notes}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error loading transaction details:', error);
+                    document.getElementById('transactionDetails').innerHTML = `
+                        <div class="alert alert-danger">
+                            Error loading transaction details. Please try again later.
+                        </div>
+                    `;
+                });
+        });
+    }
+});
+</script>
+{% endblock %} 

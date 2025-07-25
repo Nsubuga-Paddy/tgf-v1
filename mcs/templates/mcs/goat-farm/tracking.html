@@ -1,0 +1,488 @@
+{% extends 'mcs/goat-farm/base.html' %} 
+{% block title %}Goat Farm Visual Tracking - MCS{% endblock %} 
+
+{% block content %}
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Visual Farm Tracking</h1>
+    <div>
+      <a href="{% url 'goat_farm_dashboard' %}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Satellite Status Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-white">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-satellite me-2"></i>Satellite Monitoring Status
+          </h5>
+          <span class="badge bg-success">Live</span>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="text-center">
+                <i class="fas fa-map-marked-alt fa-2x text-primary mb-2"></i>
+                <h6>Coverage Area</h6>
+                <p class="mb-0">{{ satellite_data.coverage_area }}</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <i class="fas fa-eye fa-2x text-info mb-2"></i>
+                <h6>Resolution</h6>
+                <p class="mb-0">{{ satellite_data.resolution }}</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <i class="fas fa-cloud-sun fa-2x text-warning mb-2"></i>
+                <h6>Weather</h6>
+                <p class="mb-0">{{ satellite_data.weather_conditions }}</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <i class="fas fa-thermometer-half fa-2x text-danger mb-2"></i>
+                <h6>Temperature</h6>
+                <p class="mb-0">{{ satellite_data.temperature }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <small class="text-muted">
+                <i class="fas fa-clock me-1"></i>Last Updated: {{ satellite_data.last_updated|date:"M d, Y H:i" }}
+              </small>
+            </div>
+            <div class="col-md-6 text-end">
+              <small class="text-muted">
+                Humidity: {{ satellite_data.humidity }} | Wind: {{ satellite_data.wind_speed }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Row -->
+  <div class="row">
+    <!-- Satellite Map Section -->
+    <div class="col-lg-8 mb-4">
+      <div class="card bg-white h-100">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-map fa-2x text-primary me-2"></i>Farm Satellite View
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <!-- Satellite Map Container -->
+          <div id="satelliteMap" class="position-relative" style="height: 500px;">
+            <!-- Google Maps Satellite View -->
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1540.3352927365922!2d32.89821386377926!3d0.14188359741495365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMMKwMDgnMzAuNiJOIDMywrA1Myc1NC43IkU!5e1!3m2!1sen!2sug!4v1752632239507!5m2!1sen!2sug" 
+              width="100%" 
+              height="100%" 
+              style="border:0;" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            
+            <!-- Farm Zone Overlays (Positioned over the map) -->
+            <div class="position-absolute top-0 start-0 w-100 h-100 pointer-events-none">
+              {% for zone in farm_zones %}
+              <div class="position-absolute" style="top: {{ forloop.counter|add:10 }}%; left: {{ forloop.counter|add:20 }}%; pointer-events-auto;">
+                <div class="bg-success bg-opacity-75 text-white p-2 rounded shadow" style="min-width: 120px; backdrop-filter: blur(5px);">
+                  <small><strong>{{ zone.name }}</strong></small><br>
+                  <small>{{ zone.goats_count }} goats</small><br>
+                  <small>{{ zone.area }}</small>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          
+          <!-- Map Controls -->
+          <div class="p-3 border-top">
+            <div class="row">
+              <div class="col-md-6">
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="changeMapView('satellite')">
+                  <i class="fas fa-satellite"></i> Satellite
+                </button>
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="changeMapView('terrain')">
+                  <i class="fas fa-mountain"></i> Terrain
+                </button>
+                <button class="btn btn-sm btn-outline-info" onclick="changeMapView('street')">
+                  <i class="fas fa-road"></i> Street
+                </button>
+              </div>
+              <div class="col-md-6 text-end">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="showZones" checked>
+                  <label class="form-check-label" for="showZones">Show Zones</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="checkbox" id="showActivity" checked>
+                  <label class="form-check-label" for="showActivity">Show Activity</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm Statistics -->
+    <div class="col-lg-4 mb-4">
+      <div class="card bg-white h-100">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-bar me-2"></i>Farm Statistics
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6 mb-3">
+              <div class="text-center">
+                <div class="bg-primary bg-opacity-10 rounded p-3">
+                  <i class="fas fa-goat fa-2x text-primary mb-2"></i>
+                  <h4 class="mb-1">{{ total_goats }}</h4>
+                  <small class="text-muted">Total Goats</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 mb-3">
+              <div class="text-center">
+                <div class="bg-success bg-opacity-10 rounded p-3">
+                  <i class="fas fa-heart fa-2x text-success mb-2"></i>
+                  <h4 class="mb-1">{{ healthy_goats }}</h4>
+                  <small class="text-muted">Healthy</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 mb-3">
+              <div class="text-center">
+                <div class="bg-warning bg-opacity-10 rounded p-3">
+                  <i class="fas fa-baby fa-2x text-warning mb-2"></i>
+                  <h4 class="mb-1">{{ pregnant_goats }}</h4>
+                  <small class="text-muted">Pregnant</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 mb-3">
+              <div class="text-center">
+                <div class="bg-info bg-opacity-10 rounded p-3">
+                  <i class="fas fa-star fa-2x text-info mb-2"></i>
+                  <h4 class="mb-1">{{ total_offspring }}</h4>
+                  <small class="text-muted">Offspring</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Farm Activity Timeline -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card bg-white">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-history me-2"></i>Farm Activity Timeline
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+            {% for activity in farm_activities %}
+            <div class="d-flex mb-4">
+              <div class="flex-shrink-0">
+                <div class="bg-{{ activity.color }} bg-opacity-10 rounded-circle p-2">
+                  <i class="fas fa-{{ activity.icon }} text-{{ activity.color }}"></i>
+                </div>
+              </div>
+              <div class="flex-grow-1 ms-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1">{{ activity.title }}</h6>
+                    <p class="mb-1 text-muted">{{ activity.description }}</p>
+                  </div>
+                  <small class="text-muted">{{ activity.date|date:"M d, Y" }}</small>
+                </div>
+                {% if activity.goat %}
+                <small class="text-muted">
+                  <i class="fas fa-map-marker-alt me-1"></i>Zone: {{ activity.goat.investment.package.name }}
+                </small>
+                {% endif %}
+              </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-4">
+              <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+              <h6 class="text-muted">No recent activity</h6>
+              <p class="text-muted">Farm activities will appear here as they occur.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Satellite Imagery Options -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card bg-white">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-satellite-dish me-2"></i>Enhanced Satellite Resources
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="card border-primary">
+                <div class="card-body">
+                  <h6 class="card-title text-primary">
+                    <i class="fas fa-map-marked-alt me-2"></i>Google Earth Pro
+                  </h6>
+                  <p class="card-text small">High-resolution satellite imagery with historical data for tracking farm development over time.</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Coordinates: 0.1419° N, 32.8982° E</small>
+                    <a href="https://earth.google.com/web/search/0.1419,32.8982" target="_blank" class="btn btn-sm btn-outline-primary">
+                      <i class="fas fa-external-link-alt"></i> View
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card border-success">
+                <div class="card-body">
+                  <h6 class="card-title text-success">
+                    <i class="fas fa-camera me-2"></i>Sentinel Hub
+                  </h6>
+                  <p class="card-text small">Free satellite imagery with frequent updates (5-10 days) for monitoring vegetation and farm activities.</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">10m resolution</small>
+                    <a href="https://apps.sentinel-hub.com/eo-browser/" target="_blank" class="btn btn-sm btn-outline-success">
+                      <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card border-info">
+                <div class="card-body">
+                  <h6 class="card-title text-info">
+                    <i class="fas fa-satellite me-2"></i>NASA Worldview
+                  </h6>
+                  <p class="card-text small">Real-time satellite data with various sensors for comprehensive farm monitoring and analysis.</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Daily updates</small>
+                    <a href="https://worldview.earthdata.nasa.gov/" target="_blank" class="btn btn-sm btn-outline-info">
+                      <i class="fas fa-external-link-alt"></i> Access
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card border-warning">
+                <div class="card-body">
+                  <h6 class="card-title text-warning">
+                    <i class="fas fa-drone me-2"></i>Drone Integration
+                  </h6>
+                  <p class="card-text small">Future enhancement: Real-time drone footage for detailed farm monitoring and activity tracking.</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Coming soon</small>
+                    <button class="btn btn-sm btn-outline-warning" disabled>
+                      <i class="fas fa-clock"></i> Pending
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Monitoring Alerts -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card bg-white">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-bell me-2"></i>Real-time Alerts
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-thermometer-half me-2"></i>
+                <div>
+                  <strong>Temperature Alert</strong><br>
+                  <small>Optimal range maintained (20-30°C)</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="alert alert-success d-flex align-items-center">
+                <i class="fas fa-tint me-2"></i>
+                <div>
+                  <strong>Water Level</strong><br>
+                  <small>All troughs at optimal levels</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="alert alert-warning d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <div>
+                  <strong>Feed Inventory</strong><br>
+                  <small>Low on concentrate feed (2 days left)</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Farm coordinates
+    const farmCoordinates = {
+      lat: 0.1419,
+      lng: 32.8982,
+      name: "MCS Goat Farm"
+    };
+
+    // Map view change function
+    window.changeMapView = function(viewType) {
+      const iframe = document.querySelector('#satelliteMap iframe');
+      if (iframe) {
+        let newSrc = '';
+        
+        switch(viewType) {
+          case 'satellite':
+            newSrc = `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1540.3352927365922!2d32.89821386377926!3d0.14188359741495365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMMKwMDgnMzAuNiJOIDMywrA1Myc1NC43IkU!5e1!3m2!1sen!2sug!4v1752632239507!5m2!1sen!2sug`;
+            break;
+          case 'terrain':
+            newSrc = `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1540.3352927365922!2d32.89821386377926!3d0.14188359741495365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMMKwMDgnMzAuNiJOIDMywrA1Myc1NC43IkU!5e1!3m2!1sen!2sug!4v1752632239507!5m2!1sen!2sug&t=p`;
+            break;
+          case 'street':
+            newSrc = `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1540.3352927365922!2d32.89821386377926!3d0.14188359741495365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMMKwMDgnMzAuNiJOIDMywrA1Myc1NC43IkU!5e1!3m2!1sen!2sug!4v1752632239507!5m2!1sen!2sug&t=m`;
+            break;
+        }
+        
+        if (newSrc) {
+          iframe.src = newSrc;
+          
+          // Update button states
+          document.querySelectorAll('[onclick^="changeMapView"]').forEach(btn => {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-primary');
+          });
+          
+          event.target.classList.remove('btn-outline-primary');
+          event.target.classList.add('btn-primary');
+        }
+      }
+    };
+
+    // Simulate real-time updates
+    function updateSatelliteData() {
+      const now = new Date();
+      const timeElement = document.querySelector('.text-muted small');
+      if (timeElement) {
+        timeElement.textContent = `Last Updated: ${now.toLocaleString()}`;
+      }
+    }
+
+    // Update every 30 seconds
+    setInterval(updateSatelliteData, 30000);
+
+    // Map controls functionality
+    document.getElementById('showZones').addEventListener('change', function() {
+      const zones = document.querySelectorAll('.position-absolute .bg-success');
+      zones.forEach(zone => {
+        zone.parentElement.style.display = this.checked ? 'block' : 'none';
+      });
+    });
+
+    // Activity visibility toggle
+    document.getElementById('showActivity').addEventListener('change', function() {
+      const activityIndicators = document.querySelectorAll('.activity-indicator');
+      activityIndicators.forEach(indicator => {
+        indicator.style.display = this.checked ? 'block' : 'none';
+      });
+    });
+
+    // Simulate activity updates
+    function addActivityUpdate() {
+      const activities = [
+        { title: 'Health Check Completed', description: 'Routine health check for Zone 1 goats', icon: 'stethoscope', color: 'info' },
+        { title: 'Feed Distribution', description: 'Morning feed distributed to all zones', icon: 'wheat-awn', color: 'success' },
+        { title: 'Water Level Check', description: 'All water troughs at optimal levels', icon: 'tint', color: 'primary' },
+        { title: 'Satellite Scan', description: 'High-resolution satellite imagery captured', icon: 'satellite', color: 'secondary' },
+        { title: 'Vegetation Analysis', description: 'Pasture health assessment completed', icon: 'leaf', color: 'success' }
+      ];
+      
+      const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+      const timeline = document.querySelector('.timeline');
+      
+      if (timeline) {
+        const activityDiv = document.createElement('div');
+        activityDiv.className = 'd-flex mb-4';
+        activityDiv.innerHTML = `
+          <div class="flex-shrink-0">
+            <div class="bg-${randomActivity.color} bg-opacity-10 rounded-circle p-2">
+              <i class="fas fa-${randomActivity.icon} text-${randomActivity.color}"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1">${randomActivity.title}</h6>
+                <p class="mb-1 text-muted">${randomActivity.description}</p>
+              </div>
+              <small class="text-muted">${new Date().toLocaleDateString()}</small>
+            </div>
+          </div>
+        `;
+        
+        timeline.insertBefore(activityDiv, timeline.firstChild);
+        
+        // Remove oldest activity if more than 10
+        const activitiesList = timeline.querySelectorAll('.d-flex');
+        if (activitiesList.length > 10) {
+          activitiesList[activitiesList.length - 1].remove();
+        }
+      }
+    }
+
+    // Add activity every 2 minutes (for demo purposes)
+    setInterval(addActivityUpdate, 120000);
+
+    // Initialize with satellite view
+    changeMapView('satellite');
+  });
+</script>
+{% endblock %}

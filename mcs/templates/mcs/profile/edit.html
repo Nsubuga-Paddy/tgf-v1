@@ -1,0 +1,149 @@
+{% extends 'mcs/base.html' %} {% load static %} {% block title %}Edit Profile -
+MCS{% endblock %} {% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">
+            <i class="fas fa-user-edit me-2"></i>Edit Profile
+          </h4>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Profile Picture -->
+            <div class="mb-4 text-center">
+              {% if profile.profile_picture %}
+              <img
+                src="{{ profile.profile_picture.url }}"
+                alt="Current Profile Picture"
+                class="rounded-circle mb-3"
+                style="width: 150px; height: 150px; object-fit: cover"
+              />
+              {% else %}
+              <div
+                class="rounded-circle mb-3 d-flex align-items-center justify-content-center bg-primary text-white"
+                style="width: 150px; height: 150px"
+              >
+                <i class="fas fa-user fa-3x"></i>
+              </div>
+              {% endif %}
+              <div class="mb-3">
+                <label for="profile_picture" class="form-label"
+                  >Change Profile Picture</label
+                >
+                <input
+                  type="file"
+                  class="form-control"
+                  id="profile_picture"
+                  name="profile_picture"
+                  accept="image/*"
+                />
+              </div>
+            </div>
+
+            <!-- User Information -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="first_name" class="form-label">First Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="first_name"
+                    name="first_name"
+                    value="{{ user.first_name }}"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="last_name" class="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="last_name"
+                    name="last_name"
+                    value="{{ user.last_name }}"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                value="{{ user.email }}"
+              />
+            </div>
+
+            <!-- Profile Information -->
+            <div class="mb-3">
+              <label for="phone_number" class="form-label">Phone Number</label>
+              <input
+                type="tel"
+                class="form-control"
+                id="phone_number"
+                name="phone_number"
+                value="{{ profile.phone_number }}"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="date_of_birth" class="form-label"
+                >Date of Birth</label
+              >
+              <input
+                type="date"
+                class="form-control"
+                id="date_of_birth"
+                name="date_of_birth"
+                value="{{ profile.date_of_birth|date:'Y-m-d' }}"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="address" class="form-label">Address</label>
+              <textarea
+                class="form-control"
+                id="address"
+                name="address"
+                rows="3"
+              >
+{{ profile.address }}</textarea
+              >
+            </div>
+
+            <div class="mb-3">
+              <label for="bio" class="form-label">Bio</label>
+              <textarea class="form-control" id="bio" name="bio" rows="3">
+{{ profile.bio }}</textarea
+              >
+              <div class="form-text">Tell us a little about yourself.</div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-between">
+              <a
+                href="{% url 'profile_view' %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

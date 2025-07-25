@@ -1,0 +1,403 @@
+{% extends 'mcs/goat-farm/base.html' %} {% block title %}Goat Farm Investment -
+MCS{% endblock %} {% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Investment Packages</h1>
+    <div>
+      <a href="{% url 'goat_farm_dashboard' %}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Investment Packages -->
+  <div class="row g-4 mb-5">
+    <!-- Package 1 -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Starter Package</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <div class="display-4 text-primary mb-3">
+              <i class="fas fa-goat"></i>
+            </div>
+            <h3 class="mb-2">2 Female Goats</h3>
+            <h4 class="text-primary mb-3">UGX 2,200,000</h4>
+            <p class="text-muted">Get 6 goats in one year</p>
+          </div>
+          <ul class="list-unstyled mb-4">
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              2 Female goats (UGX 600,000 each)
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Expected 4 offspring in one year
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Professional farm management
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Monthly health checkups
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Regular progress reports
+            </li>
+          </ul>
+          <div class="d-grid">
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#investModal"
+              data-package="starter"
+              data-amount="2200000"
+            >
+              Invest Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Package 2 -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Premium Package</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <div class="display-4 text-primary mb-3">
+              <i class="fas fa-goat"></i>
+            </div>
+            <h3 class="mb-2">4 Female Goats</h3>
+            <h4 class="text-primary mb-3">UGX 3,400,000</h4>
+            <p class="text-muted">Get 12 goats in one year</p>
+          </div>
+          <ul class="list-unstyled mb-4">
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              4 Female goats (UGX 600,000 each)
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Expected 8 offspring in one year
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Professional farm management
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Weekly health checkups
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Detailed progress reports
+            </li>
+            <li class="mb-2">
+              <i class="fas fa-check text-success me-2"></i>
+              Priority support
+            </li>
+          </ul>
+          <div class="d-grid">
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#investModal"
+              data-package="premium"
+              data-amount="3400000"
+            >
+              Invest Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Current Investments -->
+  <div class="card">
+    <div class="card-header bg-transparent">
+      <h5 class="card-title mb-0">Your Current Investments</h5>
+    </div>
+    <div class="card-body">
+      {% if current_investments %}
+      <div class="table-responsive">
+        <table class="table table-custom">
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Investment Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Expected Returns</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for investment in current_investments %}
+            <tr>
+              <td>{{ investment.package_name }}</td>
+              <td>{{ investment.investment_date }}</td>
+              <td>UGX {{ investment.amount|floatformat:0 }}</td>
+              <td>
+                <span class="badge bg-{{ investment.status_color }}">
+                  {{ investment.status }}
+                </span>
+              </td>
+              <td>{{ investment.expected_returns }} goats</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#detailsModal"
+                  data-investment-id="{{ investment.id }}"
+                >
+                  View Details
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <i class="fas fa-piggy-bank fa-3x text-muted mb-3"></i>
+        <p class="text-muted mb-0">You haven't made any investments yet</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Investment Modal -->
+<div class="modal fade" id="investModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Investment</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <form method="post" action="{% url 'goat_farm_investment' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="package_type" id="packageType" />
+          <input type="hidden" name="amount" id="investmentAmount" />
+
+          <div class="mb-4">
+            <h6 class="mb-3">Investment Summary</h6>
+            <div class="alert alert-light">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Package:</span>
+                <strong id="packageName"></strong>
+              </div>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Amount:</span>
+                <strong id="amountDisplay"></strong>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Expected Returns:</span>
+                <strong id="expectedReturns"></strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Payment Method</label>
+            <select class="form-select" name="payment_method" required>
+              <option value="">Select payment method</option>
+              <option value="mobile_money">Mobile Money</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="cash">Cash</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Payment Reference</label>
+            <input
+              type="text"
+              class="form-control"
+              name="payment_reference"
+              required
+            />
+            <small class="text-muted"
+              >Enter your payment reference number</small
+            >
+          </div>
+
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Please make your payment and enter the reference number above. Your
+            investment will be confirmed once the payment is verified.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Confirm Investment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Investment Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Investment Details</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div id="investmentDetails">
+          <!-- Content will be loaded dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Handle investment modal
+    const investModal = document.getElementById("investModal");
+    if (investModal) {
+      investModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        const package = button.getAttribute("data-package");
+        const amount = button.getAttribute("data-amount");
+
+        // Update modal content
+        document.getElementById("packageType").value = package;
+        document.getElementById("investmentAmount").value = amount;
+        document.getElementById("packageName").textContent =
+          package === "starter" ? "Starter Package" : "Premium Package";
+        document.getElementById("amountDisplay").textContent =
+          "UGX " + Number(amount).toLocaleString();
+        document.getElementById("expectedReturns").textContent =
+          package === "starter" ? "6 goats" : "12 goats";
+      });
+    }
+
+    // Handle investment details modal
+    const detailsModal = document.getElementById("detailsModal");
+    if (detailsModal) {
+      detailsModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        const investmentId = button.getAttribute("data-investment-id");
+
+        // Load investment details
+        fetch(`/goat-farm/investment/${investmentId}/details/`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("investmentDetails").innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Investment Information</h6>
+                                <table class="table">
+                                    <tr>
+                                        <th>Package</th>
+                                        <td>${data.package_name}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Investment Date</th>
+                                        <td>${data.investment_date}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Amount</th>
+                                        <td>UGX ${Number(
+                                          data.amount
+                                        ).toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Status</th>
+                                        <td><span class="badge bg-${
+                                          data.status_color
+                                        }">${data.status}</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Progress</h6>
+                                <div class="progress mb-3" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: ${data.progress}%" 
+                                         aria-valuenow="${data.progress}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        ${data.progress}%
+                                    </div>
+                                </div>
+                                <p class="mb-2"><strong>Expected Returns:</strong> ${
+                                  data.expected_returns
+                                } goats</p>
+                                <p class="mb-2"><strong>Expected Date:</strong> ${
+                                  data.expected_date
+                                }</p>
+                                <p class="mb-0"><strong>Next Update:</strong> ${
+                                  data.next_update
+                                }</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="mb-3">Recent Updates</h6>
+                                <div class="timeline">
+                                    ${data.updates
+                                      .map(
+                                        (update) => `
+                                        <div class="d-flex mb-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-${update.icon} text-${update.color}"></i>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <p class="mb-1">${update.message}</p>
+                                                <small class="text-muted">${update.date}</small>
+                                            </div>
+                                        </div>
+                                    `
+                                      )
+                                      .join("")}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+          })
+          .catch((error) => {
+            console.error("Error loading investment details:", error);
+            document.getElementById("investmentDetails").innerHTML = `
+                        <div class="alert alert-danger">
+                            Error loading investment details. Please try again later.
+                        </div>
+                    `;
+          });
+      });
+    }
+  });
+</script>
+{% endblock %}

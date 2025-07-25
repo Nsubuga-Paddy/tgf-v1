@@ -1,0 +1,302 @@
+{% extends 'mcs/clubs/base.html' %} {% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div
+    class="alert mb-4"
+    role="alert"
+    style="background: linear-gradient(45deg, #fd7e14, #e06c0c); color: white"
+  >
+    <div class="d-flex align-items-center">
+      <div class="flex-shrink-0">
+        <i class="fas fa-exchange-alt fa-2x me-3"></i>
+      </div>
+      <div class="flex-grow-1">
+        <h4 class="alert-heading mb-1 text-white">
+          Welcome to {% if club and club.name %}{{ club.name }}{% else %}Club{% endif %}'s Transactions
+        </h4>
+        <p class="mb-0 text-white-50">
+          Track and manage all your club's financial activities, including
+          contributions, withdrawals, and fixed savings records.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-4 mb-4">
+    <!-- Total Transactions -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Total Transactions</h6>
+              <h2 class="card-title mb-0">{{ total_transactions }}</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-exchange-alt fa-2x"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Last 30 days</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contributions & Withdrawals -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-3 text-muted">Monthly Transactions</h6>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <small class="text-muted d-block">Contributions</small>
+              <h4 class="mb-0 text-success">UGX {{ monthly_contributions|floatformat:0 }}</h4>
+            </div>
+            <div class="icon text-success">
+              <i class="fas fa-arrow-up fa-2x"></i>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <small class="text-muted d-block">Withdrawals</small>
+              <h4 class="mb-0 text-danger">UGX {{ monthly_withdrawals|floatformat:0 }}</h4>
+            </div>
+            <div class="icon text-danger">
+              <i class="fas fa-arrow-down fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fixed Savings & Interest -->
+    <div class="col-md-6 col-lg-5">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-3 text-muted">Fixed Savings Summary</h6>
+          <div class="row">
+            <div class="col-6">
+              <div
+                class="d-flex justify-content-between align-items-center mb-3"
+              >
+                <div>
+                  <small class="text-muted d-block">Fixed Amount</small>
+                  <h4 class="mb-0">UGX {{ total_fixed_amount|floatformat:0 }}</h4>
+                </div>
+                <div class="icon text-primary">
+                  <i class="fas fa-lock fa-2x"></i>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <small class="text-muted d-block">Available</small>
+                  <h4 class="mb-0">UGX {{ available_savings|floatformat:0 }}</h4>
+                </div>
+                <div class="icon text-warning">
+                  <i class="fas fa-wallet fa-2x"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <small class="text-muted d-block">Expected Interest</small>
+                  <h4 class="mb-0 text-success">UGX {{ total_expected_interest|floatformat:0 }}</h4>
+                  <small class="text-muted">@ 10% p.a.</small>
+                </div>
+                <div class="icon text-success">
+                  <i class="fas fa-percentage fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction Filters -->
+  <div class="card bg-white mb-4">
+    <div class="card-body">
+      <form class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Date Range</label>
+          <select class="form-select">
+            <option>Last 7 days</option>
+            <option>Last 30 days</option>
+            <option>Last 3 months</option>
+            <option>Custom Range</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Transaction Type</label>
+          <select class="form-select">
+            <option>All Types</option>
+            <option>Contributions</option>
+            <option>Withdrawals</option>
+            <option>Fixed Savings</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select class="form-select">
+            <option>All Status</option>
+            <option>Completed</option>
+            <option>Pending</option>
+            <option>Failed</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Search</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Receipt No. or Member"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Regular Transactions Table -->
+  <div class="card bg-white mb-4">
+    <div
+      class="card-header bg-transparent d-flex justify-content-between align-items-center"
+    >
+      <h5 class="card-title mb-0">Transactions Records</h5>
+      <div class="btn-group">
+        <button class="btn btn-sm btn-outline-primary active">All</button>
+        <button class="btn btn-sm btn-outline-primary">Contributions</button>
+        <button class="btn btn-sm btn-outline-primary">Withdrawals</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Receipt No.</th>
+              <th>Date</th>
+              <th>Member</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Payment Method</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if transactions_data %}
+              {% for transaction in transactions_data %}
+              <tr>
+                <td>{{ transaction.receipt_number }}</td>
+                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.member }}</td>
+                <td>
+                  {% if transaction.type == 'Deposit' %}
+                    <span class="badge bg-success">{{ transaction.type }}</span>
+                  {% elif transaction.type == 'Withdrawal' %}
+                    <span class="badge bg-danger">{{ transaction.type }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ transaction.type }}</span>
+                  {% endif %}
+                </td>
+                <td>UGX {{ transaction.amount|floatformat:0 }}</td>
+                <td>{{ transaction.payment_method }}</td>
+                <td><span class="badge bg-success">{{ transaction.status }}</span></td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center text-muted">No transactions found</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Previous</a>
+          </li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Fixed Savings Records -->
+  <div class="card bg-white">
+    <div
+      class="card-header bg-transparent d-flex justify-content-between align-items-center"
+    >
+      <h5 class="card-title mb-0">Fixed Savings Records</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Receipt No.</th>
+              <th>Date Fixed</th>
+              <th>Amount</th>
+              <th>Interest Rate</th>
+              <th>Maturity Date</th>
+              <th>Expected Interest</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if fixed_savings_data %}
+              {% for fixed in fixed_savings_data %}
+              <tr>
+                <td>{{ fixed.receipt_number }}</td>
+                <td>{{ fixed.date_fixed }}</td>
+                <td>UGX {{ fixed.amount|floatformat:0 }}</td>
+                <td>{{ fixed.interest_rate }}</td>
+                <td>{{ fixed.maturity_date }}</td>
+                <td>UGX {{ fixed.expected_interest|floatformat:0 }}</td>
+                <td>
+                  {% if fixed.status == 'Active' %}
+                    <span class="badge bg-success">{{ fixed.status }}</span>
+                  {% elif fixed.status == 'Matured' %}
+                    <span class="badge bg-warning">{{ fixed.status }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ fixed.status }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="8" class="text-center text-muted">No fixed savings records found</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Previous</a>
+          </li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+{% endblock %}

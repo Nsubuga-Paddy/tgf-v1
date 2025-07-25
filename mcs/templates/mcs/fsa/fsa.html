@@ -1,0 +1,850 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fixed Savings Account - Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Existing meta tags -->
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Prevent content jumping -->
+    <meta name="theme-color" content="#ff6b00" />
+    <!-- Add favicon for professional look -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <style>
+      :root {
+        --primary-color: #fd7e14;
+        --dark-orange: #e06c0c;
+        --sidebar-bg: #fff3e6;
+        --sidebar-active: #fd7e14;
+        --sidebar-link: #fd7e14;
+        --sidebar-link-hover: #ffe0b3;
+      }
+
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .navbar {
+        background-color: var(--primary-color) !important;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: var(--sidebar-bg);
+        padding-top: 60px;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .sidebar.collapsed {
+        left: -250px;
+      }
+
+      .sidebar .nav-link {
+        color: var(--primary-color);
+        padding: 0.8rem 1rem;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        margin: 0.2rem 0.5rem;
+        font-weight: 500;
+      }
+
+      .sidebar .nav-link:hover {
+        background-color: var(--sidebar-link-hover);
+        color: var(--primary-color);
+      }
+
+      .sidebar .nav-link.active {
+        background-color: var(--sidebar-active);
+        color: #fff;
+      }
+
+      .sidebar .nav-link i {
+        width: 25px;
+        text-align: center;
+        margin-right: 10px;
+      }
+
+      /* Main Content Adjustment */
+      .main-content {
+        margin-left: 250px;
+        transition: all 0.3s ease;
+        width: calc(100% - 250px);
+      }
+
+      .main-content.expanded {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      /* Toggle Button */
+      .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1100;
+        background-color: var(--primary-color);
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: block;
+      }
+
+      .sidebar-toggle:hover {
+        background-color: #e06c0c;
+      }
+
+      @media (min-width: 992px) {
+        .sidebar-toggle {
+          display: none;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .sidebar {
+          left: -250px;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
+
+      /* Existing styles */
+      .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-header {
+        border-bottom: 1px solid #eee;
+      }
+
+      .text-primary {
+        color: var(--primary-color) !important;
+      }
+
+      .summary-item {
+        transition: all 0.3s ease;
+      }
+
+      .summary-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .badge {
+        padding: 0.5em 0.8em;
+      }
+
+      .badge.bg-primary {
+        background-color: var(--primary-color) !important;
+      }
+
+      .table th {
+        font-weight: 600;
+        color: #666;
+      }
+
+      .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      /* Dropdown Styles */
+      .dropdown-menu {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      .dropdown-item {
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-item:hover {
+        background-color: #fff3e6;
+        color: var(--primary-color);
+      }
+
+      .dropdown-item.text-danger:hover {
+        background-color: #fee2e2;
+        color: #dc3545;
+      }
+
+      .dropdown-divider {
+        margin: 0.5rem 0;
+        border-color: #f0f0f0;
+      }
+
+      .nav-link.dropdown-toggle::after {
+        margin-left: 0.5rem;
+      }
+
+      /* Welcome Message Styles */
+      .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-orange) 100%);
+      }
+
+      .welcome-icon {
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .opacity-75 {
+        opacity: 0.75;
+      }
+
+      .opacity-50 {
+        opacity: 0.5;
+      }
+
+      .fs-5 {
+        font-size: 1.125rem !important;
+      }
+
+      /* Responsive adjustments for welcome message */
+      @media (max-width: 768px) {
+        .welcome-icon {
+          text-align: center !important;
+          margin-top: 1rem;
+        }
+        
+        .welcome-icon i {
+          font-size: 3rem !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container-fluid">
+        <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand" href="{% url 'home' %}">
+          <img
+            src="{% static 'tgfs/images/tgfs.png' %}"
+            alt="MCS Logo"
+            height="40"
+          />
+        </a>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <div class="navbar-nav">
+            <div class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-light"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="{% url 'profile_view' %}">
+                    <i class="fas fa-user me-2"></i>Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'home' %}">
+                    <i class="fas fa-home me-2"></i>Home
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form
+                    action="{% url 'logout' %}"
+                    method="post"
+                    class="d-inline"
+                  >
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="d-flex flex-column h-100">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a
+              class="nav-link {% if request.resolver_match.url_name == 'fsa_dashboard' %}active{% endif %}"
+              href="{% url 'fsa_dashboard' %}"
+            >
+              <i class="fas fa-chart-line"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link {% if request.resolver_match.url_name == 'fsa_terms' %}active{% endif %}"
+              href="{% url 'fsa_terms' %}"
+            >
+              <i class="fas fa-file-contract"></i>Terms
+            </a>
+          </li>
+          <li class="nav-item mt-auto">
+            <a class="nav-link" href="{% url 'home' %}">
+              <i class="fas fa-home"></i>Back to Home
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <div class="container-fluid py-4">
+        <!-- Welcome Message -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <div class="card border-0 bg-gradient-primary text-white">
+              <div class="card-body p-4">
+                <div class="row align-items-center">
+                  <div class="col-md-8">
+                    <h2 class="mb-2">
+                      <i class="fas fa-hand-wave me-2"></i>
+                      Hello, {{ user.first_name|default:user.username }}!
+                    </h2>
+                    <p class="mb-0 fs-5 opacity-75">
+                      Grow your investment steadily with MCS competitive interest rates.
+                    </p>
+                  </div>
+                  <div class="col-md-4 text-md-end">
+                    <div class="welcome-icon">
+                      <i class="fas fa-wallet fa-4x opacity-50"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Summary Row -->
+        <div class="row mb-4">
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <i class="fas fa-coins fa-3x text-primary"></i>
+                </div>
+                <h4 class="text-primary mb-1">UGX{{ dashboard_data.principal_amount|floatformat:2 }}</h4>
+                <p class="text-muted mb-0">Total Fixed Amount</p>
+                <hr class="my-2">
+                <h6 class="text-success mb-1">UGX{{ dashboard_data.matured_amount|floatformat:2 }}</h6>
+                <small class="text-muted">Matured Amount</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <i class="fas fa-chart-line fa-3x text-primary"></i>
+                </div>
+                <h4 class="text-primary mb-1">UGX{{ dashboard_data.expected_interest|floatformat:2 }}</h4>
+                <p class="text-muted mb-0">Total Expected Interest</p>
+                <hr class="my-2">
+                <h6 class="text-success mb-1">UGX{{ dashboard_data.interest_earned_so_far|floatformat:2 }}</h6>
+                <small class="text-muted">Interest Earned So Far</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body text-center">
+                <div class="mb-3">
+                  <i class="fas fa-calendar-check fa-3x text-primary"></i>
+                </div>
+                <h4 class="text-info mb-1">{% if dashboard_data.maturity_date %}{{ dashboard_data.maturity_date|date:"M d, Y" }}{% else %}N/A{% endif %}</h4>
+                <p class="text-muted mb-0">Maturity Date</p>
+                <hr class="my-2">
+                <h6 class="text-primary mb-1">{{ dashboard_data.days_remaining }} Days</h6>
+                <small class="text-muted">Remaining</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Fixed Savings Details Table -->
+          <div class="col-md-12 mb-4">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                  <i class="fas fa-table text-primary me-2"></i>
+                  Fixed Savings Details
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Amount Fixed</th>
+                        <th>Date of Fixing</th>
+                        <th>Interest Rate</th>
+                        <th>Maturity Period</th>
+                        <th>Maturity Date</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for record in fixed_savings_records %}
+                      <tr>
+                        <td><strong>UGX{{ record.fixed_amount|floatformat:2 }}</strong></td>
+                        <td>{{ record.date }}</td>
+                        <td><span class="badge bg-success">{{ record.interest_rate }}</span></td>
+                        <td>{{ record.period }}</td>
+                        <td>{{ record.maturity_date }}</td>
+                        <td><span class="badge bg-success">{{ record.status }}</span></td>
+                      </tr>
+                      {% empty %}
+                      <tr>
+                        <td colspan="6" class="text-center text-muted">No fixed savings records found</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Maturity Details -->
+          <div class="col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                  <i class="fas fa-calendar-alt text-primary me-2"></i>
+                  Maturity Details
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="maturity-info">
+                  <div class="alert alert-info mb-4">
+                    <div class="d-flex">
+                      <i class="fas fa-info-circle me-3 mt-1"></i>
+                      <div>
+                        <h6 class="alert-heading">Maturity Information</h6>
+                        <p class="mb-0">
+                          Your fixed savings will mature on <strong>{% if dashboard_data.maturity_date %}{{ dashboard_data.maturity_date|date:"F d, Y" }}{% else %}TBD{% endif %}</strong>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <div class="col-md-6">
+                      <div class="maturity-period p-3 border rounded">
+                        <h6 class="text-muted mb-2">Maturity Period</h6>
+                        <h5 class="mb-0 text-primary">{{ dashboard_data.maturity_period }} Months</h5>
+                        <small class="text-muted">{% if dashboard_data.date_fixed %}{{ dashboard_data.date_fixed|date:"M d, Y" }}{% else %}N/A{% endif %} - {% if dashboard_data.maturity_date %}{{ dashboard_data.maturity_date|date:"M d, Y" }}{% else %}N/A{% endif %}</small>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="maturity-date p-3 border rounded">
+                        <h6 class="text-muted mb-2">Maturity Date</h6>
+                        <h5 class="mb-0 text-success">{% if dashboard_data.maturity_date %}{{ dashboard_data.maturity_date|date:"M d, Y" }}{% else %}N/A{% endif %}</h5>
+                        <small class="text-muted">{{ dashboard_data.days_remaining }} days remaining</small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Maturity Details Mini-Table -->
+                  <div class="maturity-details-table mb-4">
+                    <h6 class="mb-3">Maturity Details by Account</h6>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                          <tr>
+                            <th>Amount to Mature</th>
+                            <th>Days Left</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for record in fixed_savings_records %}
+                          <tr>
+                            <td><strong>UGX{{ record.total_maturing|floatformat:0 }}</strong></td>
+                            <td>
+                              {% if record.days_remaining %}
+                                <span class="badge {% if record.days_remaining <= 30 %}bg-warning{% elif record.days_remaining <= 7 %}bg-danger{% else %}bg-success{% endif %}">
+                                  {{ record.days_remaining }} days
+                                </span>
+                              {% else %}
+                                <span class="badge bg-secondary">Matured</span>
+                              {% endif %}
+                            </td>
+                            <td>
+                              <span class="badge {% if record.status == 'Active' %}bg-success{% elif record.status == 'Matured' %}bg-info{% else %}bg-secondary{% endif %}">
+                                {{ record.status }}
+                              </span>
+                            </td>
+                          </tr>
+                          {% empty %}
+                          <tr>
+                            <td colspan="3" class="text-center text-muted">No fixed savings accounts found</td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div class="maturity-options">
+                    <h6 class="mb-3">What happens to your money after maturity?</h6>
+                    <div class="form-check mb-3">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="maturityOption"
+                        id="withdraw"
+                        checked
+                      />
+                      <label class="form-check-label" for="withdraw">
+                        <strong>Withdraw</strong>
+                        <p class="text-muted mb-0">
+                          Withdraw the full matured amount to your linked account
+                        </p>
+                      </label>
+                    </div>
+                    <div class="form-check mb-3">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="maturityOption"
+                        id="reinvest"
+                      />
+                      <label class="form-check-label" for="reinvest">
+                        <strong>Reinvest</strong>
+                        <p class="text-muted mb-0">
+                          Automatically reinvest for another 12-month term
+                        </p>
+                      </label>
+                    </div>
+                    <div class="form-check mb-3">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="maturityOption"
+                        id="partial"
+                      />
+                      <label class="form-check-label" for="partial">
+                        <strong>Partial Withdrawal</strong>
+                        <p class="text-muted mb-0">
+                          Withdraw a portion and reinvest the rest
+                        </p>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <button class="btn btn-primary w-100">
+                      <i class="fas fa-save me-2"></i>Save Maturity Preference
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interest Details -->
+          <div class="col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                  <i class="fas fa-percentage text-primary me-2"></i>
+                  Interest Details
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="interest-info">
+                  <div class="alert alert-success mb-4">
+                    <div class="d-flex">
+                      <i class="fas fa-chart-line me-3 mt-1"></i>
+                      <div>
+                        <h6 class="alert-heading">Interest Summary</h6>
+                        <p class="mb-0">
+                          Your investment is earning <strong>{{ dashboard_data.interest_rate|floatformat:2 }}% p.a.</strong> with {{ dashboard_data.compounding_frequency }} compounding
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <div class="col-md-6">
+                      <div class="expected-interest p-3 border rounded">
+                        <h6 class="text-muted mb-2">Expected Interest (by maturity)</h6>
+                        <h5 class="mb-0 text-warning">UGX{{ dashboard_data.expected_interest|floatformat:2 }}</h5>
+                        <small class="text-muted">Full {{ dashboard_data.maturity_period }}-month period</small>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="earned-interest p-3 border rounded">
+                        <h6 class="text-muted mb-2">Interest Earned So Far</h6>
+                        <h5 class="mb-0 text-success">UGX{{ dashboard_data.interest_earned_so_far|floatformat:2 }}</h5>
+                        <small class="text-muted">Based on days elapsed</small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Interest Details Mini-Table -->
+                  <div class="interest-details-table mt-4">
+                    <h6 class="mb-3">Interest Details by Account</h6>
+                    <div class="table-responsive">
+                      <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                          <tr>
+                            <th>Interest to Gain</th>
+                            <th>Interest Earned</th>
+                            <th>Days to Maturity</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for record in fixed_savings_records %}
+                          <tr>
+                            <td><strong class="text-warning">UGX{{ record.expected_interest|floatformat:0 }}</strong></td>
+                            <td><strong class="text-success">UGX{{ record.interest_earned_so_far|floatformat:0 }}</strong></td>
+                            <td>
+                              {% if record.days_remaining %}
+                                <span class="badge {% if record.days_remaining <= 30 %}bg-warning{% elif record.days_remaining <= 7 %}bg-danger{% else %}bg-success{% endif %}">
+                                  {{ record.days_remaining }} days
+                                </span>
+                              {% else %}
+                                <span class="badge bg-secondary">Matured</span>
+                              {% endif %}
+                            </td>
+                          </tr>
+                          {% empty %}
+                          <tr>
+                            <td colspan="3" class="text-center text-muted">No fixed savings accounts found</td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  
+                  <!-- Interest Calculation Details --> 
+                  <div class="interest-breakdown">
+                    <h6 class="mb-3">Interest Calculation Details</h6>
+                    <div class="table-responsive">
+                      <table class="table table-sm">
+                        <tbody>
+                          <tr>
+                            <td>Principal Amount:</td>
+                            <td class="text-end"><strong>UGX{{ dashboard_data.principal_amount|floatformat:2 }}</strong></td>
+                          </tr>
+                          <tr>
+                            <td>Interest Rate:</td>
+                            <td class="text-end">{{ dashboard_data.interest_rate|floatformat:2 }}% p.a.</td>
+                          </tr>
+                          <tr>
+                            <td>Compounding:</td>
+                            <td class="text-end">{{ dashboard_data.compounding_frequency|title }}</td>
+                          </tr>
+                          <tr>
+                            <td>Days Elapsed:</td>
+                            <td class="text-end">{{ dashboard_data.days_elapsed }} days</td>
+                          </tr>
+                          <tr>
+                            <td>Days Remaining:</td>
+                            <td class="text-end">{{ dashboard_data.days_remaining }} days</td>
+                          </tr>
+                          <tr class="table-light">
+                            <td><strong>Total Expected:</strong></td>
+                            <td class="text-end"><strong class="text-warning">UGX{{ dashboard_data.expected_interest|floatformat:2 }}</strong></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transaction History -->
+          <div class="col-md-12">
+            <div class="card">
+              <div
+                class="card-header bg-white d-flex justify-content-between align-items-center"
+              >
+                <h5 class="card-title mb-0">
+                  <i class="fas fa-history text-primary me-2"></i>
+                  Transaction Records
+                </h5>
+                <div class="btn-group">
+                  <button class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-download me-2"></i>Export
+                  </button>
+                  <button class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-filter me-2"></i>Filter
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for transaction in transaction_records %}
+                      <tr>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.description }}</td>
+                        <td><span class="badge {% if transaction.type == 'Credit' %}bg-success{% elif transaction.type == 'Debit' %}bg-danger{% else %}bg-primary{% endif %}">{{ transaction.type }}</span></td>
+                        <td class="{% if transaction.type == 'Credit' %}text-success{% elif transaction.type == 'Debit' %}text-danger{% else %}text-primary{% endif %}">{{ transaction.amount }}</td>
+                        <td>{{ transaction.balance }}</td>
+                      </tr>
+                      {% empty %}
+                      <tr>
+                        <td colspan="5" class="text-center text-muted">No transaction records found</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-3 mt-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="mb-0">
+              &copy; 2024 Mushana Multipurpose Cooperative Society. All rights
+              reserved.
+            </p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#" class="text-light me-3">Privacy Policy</a>
+            <a href="#" class="text-light">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("sidebar");
+        const mainContent = document.getElementById("mainContent");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+
+        // Toggle sidebar on button click
+        sidebarToggle.addEventListener("click", function () {
+          sidebar.classList.toggle("show");
+        });
+
+        // Handle window resize
+        window.addEventListener("resize", function () {
+          if (window.innerWidth > 992) {
+            sidebar.classList.remove("show");
+          }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener("click", function (event) {
+          if (window.innerWidth <= 992) {
+            if (
+              !sidebar.contains(event.target) &&
+              !sidebarToggle.contains(event.target)
+            ) {
+              sidebar.classList.remove("show");
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

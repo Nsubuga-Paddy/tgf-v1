@@ -1,0 +1,484 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emergency Funds - MCS</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #fd7e14;
+        --dark-orange: #e06c0c;
+        --sidebar-bg: #fff3e6;
+        --sidebar-active: #fd7e14;
+        --sidebar-link: #fd7e14;
+        --sidebar-link-hover: #ffe0b3;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Navbar Styles */
+      .navbar {
+        background-color: var(--primary-color) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-brand img {
+        height: 40px;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: var(--sidebar-bg);
+        padding-top: 60px;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .sidebar.collapsed {
+        left: -250px;
+      }
+
+      .sidebar .nav-link {
+        color: var(--primary-color);
+        padding: 0.8rem 1rem;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        margin: 0.2rem 0.5rem;
+        font-weight: 500;
+      }
+
+      .sidebar .nav-link:hover {
+        background-color: var(--sidebar-link-hover);
+        color: var(--primary-color);
+      }
+
+      .sidebar .nav-link.active {
+        background-color: var(--sidebar-active);
+        color: #fff;
+      }
+
+      .sidebar .nav-link i {
+        width: 25px;
+        text-align: center;
+        margin-right: 10px;
+      }
+
+      /* Main Content */
+      .main-content {
+        margin-left: 250px;
+        padding: 2rem;
+        flex: 1;
+      }
+
+      /* Footer */
+      .footer {
+        background-color: #343a40;
+        color: white;
+        margin-top: auto;
+        padding: 1rem 0;
+        margin-left: 250px;
+      }
+
+      .footer a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -250px;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content,
+        .footer {
+          margin-left: 0;
+        }
+      }
+
+      /* Toggle Button for Mobile */
+      .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.5rem;
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar-toggle {
+          display: block;
+        }
+      }
+
+      /* Alert Styles */
+      .alert-orange {
+        background-color: rgba(253, 126, 20, 0.08);
+        border: 1px solid rgba(253, 126, 20, 0.2);
+        border-left: 4px solid var(--primary-color);
+        color: var(--dark-orange);
+      }
+
+      .alert-orange .alert-heading {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+
+      .alert-orange ul {
+        padding-left: 1.25rem;
+      }
+
+      .alert-orange ul li {
+        margin-bottom: 0.5rem;
+        color: var(--dark-orange);
+      }
+
+      .alert-orange ul li:last-child {
+        margin-bottom: 0;
+      }
+
+      /* Button Styles */
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--dark-orange);
+        border-color: var(--dark-orange);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(253, 126, 20, 0.2);
+      }
+
+      .btn-primary:active {
+        background-color: var(--dark-orange);
+        border-color: var(--dark-orange);
+        transform: translateY(0);
+      }
+
+      .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container">
+        <div class="d-flex justify-content-center w-100 d-lg-none">
+          <a class="navbar-brand" href="{% url 'home' %}">
+            <img
+              src="{% static 'tgfs/images/tgfs.png' %}"
+              alt="MCS Logo"
+              height="40"
+            />
+          </a>
+        </div>
+        <a class="navbar-brand d-none d-lg-block" href="{% url 'home' %}">
+          <img
+            src="{% static 'tgfs/images/tgfs.png' %}"
+            alt="MCS Logo"
+            height="40"
+          />
+        </a>
+        <button
+          class="navbar-toggler position-absolute start-0"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <div class="navbar-nav">
+            <span class="nav-item nav-link text-light"
+              >Welcome, {{ user.username }}</span
+            >
+            <form action="{% url 'logout' %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-light">
+                Logout
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="d-flex flex-column h-100">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'rss_dashboard' %}">
+              <i class="fas fa-chart-line"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'rss_portfolio' %}">
+              <i class="fas fa-chart-pie"></i>My Portfolio
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'rss_emergency_funds' %}">
+              <i class="fas fa-shield-alt"></i>Emergency Funds
+            </a>
+          </li>
+          <li class="nav-item mt-auto">
+            <a class="nav-link" href="{% url 'home' %}">
+              <i class="fas fa-home"></i>Back to Home
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Emergency Funds Header -->
+      <header class="dashboard-header mb-4">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h1 class="display-5 fw-bold">Emergency Funds</h1>
+              <p class="lead text-muted">
+                Access your emergency funds when you need them most
+              </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <a
+                href="{% url 'rss_dashboard' %}"
+                class="btn btn-outline-primary"
+              >
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Emergency Funds Overview -->
+      <div class="container">
+        <div class="row g-4 mb-4">
+          <!-- Available Emergency Fund -->
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <h5 class="card-title mb-0">Available Emergency Fund</h5>
+                  <i class="fas fa-shield-alt text-warning fa-2x"></i>
+                </div>
+                <h3 class="mb-0">$0.00</h3>
+                <p class="text-muted mb-0">Ready for emergency use</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Last Access -->
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <h5 class="card-title mb-0">Last Access</h5>
+                  <i class="fas fa-history text-info fa-2x"></i>
+                </div>
+                <h3 class="mb-0">Never</h3>
+                <p class="text-muted mb-0">No emergency fund access yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency Fund Details -->
+        <div class="row g-4">
+          <!-- Access Emergency Fund -->
+          <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Access Emergency Fund</h5>
+              </div>
+              <div class="card-body">
+                <div class="alert alert-orange">
+                  <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Emergency Fund Guidelines
+                  </h5>
+                  <p class="mb-0">
+                    Emergency funds are available for unexpected financial
+                    needs. Please ensure your request meets our emergency
+                    criteria:
+                  </p>
+                  <ul class="mt-3 mb-0">
+                    <li>
+                      <i class="fas fa-check-circle me-2"></i>Medical
+                      emergencies
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle me-2"></i>Critical home
+                      repairs
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle me-2"></i>Essential vehicle
+                      repairs
+                    </li>
+                    <li>
+                      <i class="fas fa-check-circle me-2"></i>Other unforeseen
+                      emergencies
+                    </li>
+                  </ul>
+                </div>
+                <form class="mt-4">
+                  <div class="mb-3">
+                    <label for="accessAmount" class="form-label"
+                      >Amount to Access</label
+                    >
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="accessAmount"
+                        min="100"
+                        step="100"
+                        required
+                      />
+                    </div>
+                    <small class="text-muted">Minimum withdrawal: $100</small>
+                  </div>
+                  <div class="mb-3">
+                    <label for="emergencyType" class="form-label"
+                      >Emergency Type</label
+                    >
+                    <select class="form-select" id="emergencyType" required>
+                      <option value="">Select emergency type</option>
+                      <option value="medical">Medical Emergency</option>
+                      <option value="home">Home Repair</option>
+                      <option value="vehicle">Vehicle Repair</option>
+                      <option value="other">Other Emergency</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label for="emergencyDescription" class="form-label"
+                      >Emergency Description</label
+                    >
+                    <textarea
+                      class="form-control"
+                      id="emergencyDescription"
+                      rows="3"
+                      required
+                    ></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Request Emergency Access
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Access History -->
+          <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Access History</h5>
+              </div>
+              <div class="card-body">
+                <div class="text-center py-5">
+                  <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                  <h5>No access history</h5>
+                  <p class="text-muted">
+                    Your emergency fund access records will appear here
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="mb-0">
+              &copy; 2024 Mushana Multipurpose Cooperative Society. All rights
+              reserved.
+            </p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#" class="me-3">Privacy Policy</a>
+            <a href="#">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Sidebar Toggle Script -->
+    <script>
+      document
+        .getElementById("sidebarToggle")
+        .addEventListener("click", function () {
+          document.getElementById("sidebar").classList.toggle("show");
+        });
+    </script>
+  </body>
+</html>

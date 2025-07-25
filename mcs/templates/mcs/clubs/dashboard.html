@@ -1,0 +1,396 @@
+{% extends 'mcs/clubs/base.html' %} {% block content %}
+<div class="container py-4">
+  <!-- Welcome Message -->
+  <div
+    class="alert mb-4"
+    role="alert"
+    style="background: linear-gradient(45deg, #fd7e14, #e06c0c); color: white"
+  >
+    <div class="d-flex align-items-center">
+      <div class="flex-shrink-0">
+        <i class="fas fa-users fa-2x me-3"></i>
+      </div>
+      <div class="flex-grow-1">
+        <h4 class="alert-heading mb-1 text-white">
+          Welcome to {% if club %}{{ club.name }}{% else %}Club{% endif %}'s Account!
+        </h4>
+        <p class="mb-0 text-white-50">
+          Track your club's savings progress and manage your cooperative
+          activities efficiently.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="row g-4 mb-4">
+    <!-- Total Savings -->
+    <div class="col-md-4">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Total Savings</h6>
+              <h2 class="card-title mb-0">UGX {{ total_savings|floatformat:0 }}</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-piggy-bank fa-2x"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Last updated: {{ last_updated|date:"M d, Y H:i" }}</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Members -->
+    <div class="col-md-4">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Active Members</h6>
+              <h2 class="card-title mb-0">{{ active_members }}</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-user-check fa-2x"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Out of {{ total_members }} total members</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Contribution -->
+    <div class="col-md-4">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Monthly Target</h6>
+              <h2 class="card-title mb-0">UGX {{ monthly_target|floatformat:0 }}</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-bullseye fa-2x"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">UGX {{ monthly_collection|floatformat:0 }} collected ({{ monthly_progress|floatformat:1 }}%)</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="row g-4">
+    <!-- Fixed Savings Summary -->
+    <div class="col-lg-12 mb-4">
+      <div class="card bg-white">
+        <div
+          class="card-header bg-transparent d-flex justify-content-between align-items-center"
+        >
+          <h5 class="card-title mb-0">Fixed Savings Summary</h5>
+          <a href="#" class="btn btn-sm btn-outline-primary"
+            >View All Fixed Savings</a
+          >
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <!-- Total Fixed Savings -->
+            <div class="col-md-4">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-lock fa-2x text-primary me-3"></i>
+                </div>
+                <div>
+                  <h6 class="text-muted mb-1">Total Fixed Savings</h6>
+                  <h4 class="mb-0">UGX {{ total_fixed_amount|floatformat:0 }}</h4>
+                  <small class="text-muted">{{ fixed_percentage|floatformat:1 }}% of total savings</small>
+                </div>
+              </div>
+            </div>
+            <!-- Expected Interest -->
+            <div class="col-md-4">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-percentage fa-2x text-success me-3"></i>
+                </div>
+                <div>
+                  <h6 class="text-muted mb-1">Expected Interest</h6>
+                  <h4 class="mb-0">UGX {{ total_expected_interest|floatformat:0 }}</h4>
+                  <small class="text-muted">Interest earned so far: UGX {{ total_interest_gained_so_far|floatformat:0 }}</small>
+                </div>
+              </div>
+            </div>
+            <!-- Available for Fixed Savings -->
+            <div class="col-md-4">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-wallet fa-2x text-warning me-3"></i>
+                </div>
+                <div>
+                  <h6 class="text-muted mb-1">Available Savings</h6>
+                  <h4 class="mb-0">UGX {{ available_savings|floatformat:0 }}</h4>
+                  <small class="text-muted">{{ available_percentage|floatformat:1 }}% of total savings</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Fixed Savings Progress -->
+          <div class="mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="text-muted mb-0">Savings Distribution</h6>
+              <span class="text-muted small">Last updated: {{ last_updated|date:"M d, Y" }}</span>
+            </div>
+            <div class="progress" style="height: 8px">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                style="width: {{ fixed_percentage }}%"
+                aria-valuenow="{{ fixed_percentage }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                title="Fixed Savings"
+              ></div>
+              <div
+                class="progress-bar bg-warning"
+                role="progressbar"
+                style="width: {{ available_percentage }}%"
+                aria-valuenow="{{ available_percentage }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                title="Available"
+              ></div>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+              <small class="text-muted">{{ fixed_percentage|floatformat:1 }}% Fixed Savings</small>
+              <small class="text-muted">{{ available_percentage|floatformat:1 }}% Available</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fixed Savings Records -->
+    <div class="col-lg-12 mb-4">
+      <div class="card bg-white">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Fixed Savings Records</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Receipt No.</th>
+                  <th>Date Fixed</th>
+                  <th>Amount</th>
+                  <th>Interest Rate</th>
+                  <th>Maturity Date</th>
+                  <th>Expected Interest</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if fixed_savings_details %}
+                  {% for fixed in fixed_savings_details %}
+                  <tr>
+                    <td>{{ fixed.receipt_number }}</td>
+                    <td>{{ fixed.date_fixed }}</td>
+                    <td>UGX {{ fixed.amount|floatformat:0 }}</td>
+                    <td>{{ fixed.interest_rate }}</td>
+                    <td>{{ fixed.maturity_date }}</td>
+                    <td>UGX {{ fixed.expected_interest|floatformat:0 }}</td>
+                    <td>
+                      {% if fixed.status == 'Active' %}
+                        <span class="badge bg-success">{{ fixed.status }}</span>
+                      {% elif fixed.status == 'Matured' %}
+                        <span class="badge bg-warning">{{ fixed.status }}</span>
+                      {% else %}
+                        <span class="badge bg-secondary">{{ fixed.status }}</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="7" class="text-center text-muted">No fixed savings records found</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="col-lg-8">
+      <div class="card bg-white h-100">
+        <div
+          class="card-header bg-transparent d-flex justify-content-between align-items-center"
+        >
+          <h5 class="card-title mb-0">Recent Transactions</h5>
+          <a
+            href="{% url 'club_transactions' club_id=club_id %}"
+            class="btn btn-sm btn-outline-primary"
+            >View All</a
+          >
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Member</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if recent_transactions_data %}
+                  {% for transaction in recent_transactions_data %}
+                  <tr>
+                    <td>{{ transaction.date }}</td>
+                    <td>{{ transaction.member }}</td>
+                    <td>{{ transaction.type }}</td>
+                    <td>UGX {{ transaction.amount|floatformat:0 }}</td>
+                    <td><span class="badge bg-success">{{ transaction.status }}</span></td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="5" class="text-center text-muted">No recent transactions found</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Club Information -->
+    <div class="col-lg-4">
+      <div class="card bg-white h-100">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Club Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <h6 class="text-muted mb-3">Club Details</h6>
+            <ul class="list-unstyled">
+              <li class="mb-2">
+                <i class="fas fa-info-circle me-2" style="color: var(--primary-color);"></i>
+                <strong>Club Name:</strong> {{ club_info.name|default:"N/A" }}
+              </li>
+              <li class="mb-2">
+                <i class="fas fa-calendar me-2" style="color: var(--primary-color);"></i>
+                <strong>Founded:</strong> {{ club_info.founded|default:"N/A" }}
+              </li>
+              <li class="mb-2">
+                <i class="fas fa-user-tie me-2" style="color: var(--primary-color);"></i>
+                <strong>Chairperson:</strong> John Doe
+              </li>
+              <li class="mb-2">
+                <i class="fas fa-money-bill-wave me-2" style="color: var(--primary-color);"></i>
+                <strong>Monthly Target:</strong> UGX {{ club_info.monthly_target|floatformat:0|default:"0" }}
+              </li>
+            </ul>
+          </div>
+          <div class="progress mb-3" style="height: 8px">
+            <div
+              class="progress-bar bg-primary"
+              role="progressbar"
+              style="width: {{ club_info.monthly_progress_percentage|default:0 }}%"
+              aria-valuenow="{{ club_info.monthly_progress_percentage|default:0 }}"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+          <p class="text-muted small mb-0">Monthly target progress: {{ club_info.monthly_progress_percentage|floatformat:1|default:0 }}%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="col-lg-6">
+      <div class="card bg-white h-100">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Upcoming Events</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            {% if upcoming_events_data %}
+              {% for event in upcoming_events_data %}
+              <div class="list-group-item px-0">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">{{ event.title }}</h6>
+                  <small class="text-muted">{{ event.date }}</small>
+                </div>
+                <p class="mb-1">
+                  {{ event.description|truncatewords:15 }}
+                </p>
+                <small class="text-muted"
+                  ><i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}</small
+                >
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="list-group-item px-0 text-center text-muted">
+                <p class="mb-0">No upcoming events scheduled</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Activity -->
+    <div class="col-lg-6">
+      <div class="card bg-white h-100">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Member Activity</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item px-0">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-user-circle fa-2x text-primary"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h6 class="mb-1">Sarah Wilson</h6>
+                  <p class="mb-1 text-muted">Made monthly contribution</p>
+                  <small class="text-muted">2 hours ago</small>
+                </div>
+                <div class="text-end">
+                  <span class="badge bg-success">UGX 50,000</span>
+                </div>
+              </div>
+            </div>
+            <div class="list-group-item px-0">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-user-circle fa-2x text-primary"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h6 class="mb-1">Robert Brown</h6>
+                  <p class="mb-1 text-muted">Updated profile information</p>
+                  <small class="text-muted">5 hours ago</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

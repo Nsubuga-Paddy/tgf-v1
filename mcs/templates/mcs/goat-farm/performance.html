@@ -1,0 +1,221 @@
+{% extends 'mcs/goat-farm/base.html' %} {% block title %}Performance - Goat
+Farm{% endblock %} {% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Farm Performance</h1>
+    <div>
+      <a href="{% url 'goat_farm_dashboard' %}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Performance Overview -->
+  <div class="row g-4 mb-4">
+    <!-- Total Goats -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Total Goats</h6>
+              <h2 class="card-title mb-0">6</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-goat"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Female: 2 | Male: 4</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Healthy Goats -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Healthy Goats</h6>
+              <h2 class="card-title mb-0">5</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-heartbeat"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">83% of total</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expected Offspring -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Expected Offspring</h6>
+              <h2 class="card-title mb-0">4</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-baby"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Due: Aug 15, 2024</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Growth Rate -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Growth Rate</h6>
+              <h2 class="card-title mb-0">67%</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Expected in 6 months</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="row g-4">
+    <!-- Health Records -->
+    <div class="col-lg-8">
+      <div class="card bg-white">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Recent Health Records</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Goat ID</th>
+                  <th>Date</th>
+                  <th>Checkup Type</th>
+                  <th>Status</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>GF001</td>
+                  <td>2024-02-15</td>
+                  <td>Routine Checkup</td>
+                  <td><span class="badge bg-success">Healthy</span></td>
+                  <td>Regular health check completed</td>
+                </tr>
+                <tr>
+                  <td>GF002</td>
+                  <td>2024-02-15</td>
+                  <td>Pregnancy Check</td>
+                  <td><span class="badge bg-info">Pregnant</span></td>
+                  <td>Expected delivery in August</td>
+                </tr>
+                <tr>
+                  <td>GF003</td>
+                  <td>2024-02-10</td>
+                  <td>Vaccination</td>
+                  <td><span class="badge bg-success">Completed</span></td>
+                  <td>Annual vaccination administered</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expected Offspring -->
+    <div class="col-lg-4">
+      <div class="card bg-white">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">Expected Births</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            <div class="list-group-item px-0">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <h6 class="mb-0">Mother: GF001</h6>
+                <span class="badge bg-info">Expected</span>
+              </div>
+              <p class="mb-1">Due: Aug 15, 2024</p>
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                First pregnancy, healthy condition
+              </small>
+            </div>
+            <div class="list-group-item px-0">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <h6 class="mb-0">Mother: GF002</h6>
+                <span class="badge bg-info">Expected</span>
+              </div>
+              <p class="mb-1">Due: Sep 1, 2024</p>
+              <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Second pregnancy, good health
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Projections -->
+      <div class="card bg-white mt-4">
+        <div class="card-header bg-transparent">
+          <h5 class="card-title mb-0">6-Month Projection</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <div class="progress mb-2" style="height: 20px">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                style="width: 100%"
+              >
+                Current: 6 goats
+              </div>
+            </div>
+            <div class="progress" style="height: 20px">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                style="width: 67%"
+              >
+                Projected: 10 goats
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info">
+            <h6 class="alert-heading mb-2">Projection Details</h6>
+            <p class="mb-1">Expected Growth: 67%</p>
+            <p class="mb-1">New Offspring: 4 goats</p>
+            <p class="mb-0">Projected Value: UGX 6,000,000</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,497 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fixed Savings - Terms & Conditions</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Existing meta tags -->
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Prevent content jumping -->
+    <meta name="theme-color" content="#ff6b00" />
+    <!-- Add favicon for professional look -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <style>
+      :root {
+        --primary-color: #fd7e14;
+        --dark-orange: #e06c0c;
+        --sidebar-bg: #fff3e6;
+        --sidebar-active: #fd7e14;
+        --sidebar-link: #fd7e14;
+        --sidebar-link-hover: #ffe0b3;
+      }
+
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .navbar {
+        background-color: var(--primary-color) !important;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: var(--sidebar-bg);
+        padding-top: 60px;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .sidebar.collapsed {
+        left: -250px;
+      }
+
+      .sidebar .nav-link {
+        color: var(--primary-color);
+        padding: 0.8rem 1rem;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        margin: 0.2rem 0.5rem;
+        font-weight: 500;
+      }
+
+      .sidebar .nav-link:hover {
+        background-color: var(--sidebar-link-hover);
+        color: var(--primary-color);
+      }
+
+      .sidebar .nav-link.active {
+        background-color: var(--sidebar-active);
+        color: #fff;
+      }
+
+      .sidebar .nav-link i {
+        width: 25px;
+        text-align: center;
+        margin-right: 10px;
+      }
+
+      /* Main Content Adjustment */
+      .main-content {
+        margin-left: 250px;
+        transition: all 0.3s ease;
+        width: calc(100% - 250px);
+      }
+
+      .main-content.expanded {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      /* Toggle Button */
+      .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1100;
+        background-color: var(--primary-color);
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: block;
+      }
+
+      .sidebar-toggle:hover {
+        background-color: #e06c0c;
+      }
+
+      @media (min-width: 992px) {
+        .sidebar-toggle {
+          display: none;
+        }
+      }
+
+      @media (max-width: 992px) {
+        .sidebar {
+          left: -250px;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
+
+      /* Existing styles */
+      .card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-header {
+        border-bottom: 1px solid #eee;
+      }
+
+      .text-primary {
+        color: var(--primary-color) !important;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--dark-orange);
+        border-color: var(--dark-orange);
+      }
+
+      .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      /* Dropdown Styles */
+      .dropdown-menu {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      .dropdown-item {
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+      }
+
+      .dropdown-item:hover {
+        background-color: #fff3e6;
+        color: var(--primary-color);
+      }
+
+      .dropdown-item.text-danger:hover {
+        background-color: #fee2e2;
+        color: #dc3545;
+      }
+
+      .dropdown-divider {
+        margin: 0.5rem 0;
+        border-color: #f0f0f0;
+      }
+
+      .nav-link.dropdown-toggle::after {
+        margin-left: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container-fluid">
+        <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand" href="{% url 'home' %}">
+          <img
+            src="{% static 'tgfs/images/tgfs.png' %}"
+            alt="MCS Logo"
+            height="40"
+          />
+        </a>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <div class="navbar-nav">
+            <div class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-light"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="{% url 'profile_view' %}">
+                    <i class="fas fa-user me-2"></i>Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{% url 'home' %}">
+                    <i class="fas fa-home me-2"></i>Home
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <form
+                    action="{% url 'logout' %}"
+                    method="post"
+                    class="d-inline"
+                  >
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="d-flex flex-column h-100">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a
+              class="nav-link {% if request.resolver_match.url_name == 'fsa_dashboard' %}active{% endif %}"
+              href="{% url 'fsa_dashboard' %}"
+            >
+              <i class="fas fa-chart-line"></i>Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link {% if request.resolver_match.url_name == 'fsa_terms' %}active{% endif %}"
+              href="{% url 'fsa_terms' %}"
+            >
+              <i class="fas fa-file-contract"></i>Terms
+            </a>
+          </li>
+          <li class="nav-item mt-auto">
+            <a class="nav-link" href="{% url 'home' %}">
+              <i class="fas fa-home"></i>Back to Home
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <div class="container-fluid py-4">
+        <div class="row">
+          <!-- Terms and Conditions Section -->
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                  <i class="fas fa-file-contract text-primary me-2"></i>
+                  Terms and Conditions
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="terms-content">
+                  <h6 class="text-primary mb-3">Account Rules</h6>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      >Minimum deposit: $100
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      >Lock-in period: 12 months
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i>Early
+                      withdrawal penalty: 2%
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-check-circle text-success me-2"></i
+                      >Interest payment: Monthly
+                    </li>
+                  </ul>
+
+                  <h6 class="text-primary mb-3 mt-4">Fees and Charges</h6>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-info-circle text-info me-2"></i>Account
+                      maintenance: Free
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-info-circle text-info me-2"></i>Early
+                      withdrawal: 2% of amount
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-info-circle text-info me-2"></i>Statement
+                      request: Free
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tax Information Section -->
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                  <i class="fas fa-calculator text-primary me-2"></i>
+                  Tax Information
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="tax-content">
+                  <h6 class="text-primary mb-3">Tax Rates</h6>
+                  <ul class="list-unstyled">
+                    <li class="mb-2">
+                      <i class="fas fa-percentage text-success me-2"></i
+                      >Interest income tax: 15%
+                    </li>
+                    <li class="mb-2">
+                      <i class="fas fa-percentage text-success me-2"></i
+                      >Withholding tax: 10%
+                    </li>
+                  </ul>
+
+                  <h6 class="text-primary mb-3 mt-4">Tax Documents</h6>
+                  <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-outline-primary">
+                      <i class="fas fa-download me-2"></i>Tax Certificate
+                    </a>
+                    <a href="#" class="btn btn-outline-primary">
+                      <i class="fas fa-file-pdf me-2"></i>Tax Guide
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Help and Support Section -->
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <div class="card-header bg-white">
+                <h5 class="card-title mb-0">
+                  <i class="fas fa-headset text-primary me-2"></i>
+                  Help and Support
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="support-content">
+                  <h6 class="text-primary mb-3">Contact Information</h6>
+                  <ul class="list-unstyled">
+                    <li class="mb-3">
+                      <i class="fas fa-phone text-success me-2"></i>
+                      <strong>Phone:</strong><br />
+                      <span class="ms-4">+1 (555) 123-4567</span>
+                    </li>
+                    <li class="mb-3">
+                      <i class="fas fa-envelope text-success me-2"></i>
+                      <strong>Email:</strong><br />
+                      <span class="ms-4">support@savings.com</span>
+                    </li>
+                    <li class="mb-3">
+                      <i class="fas fa-clock text-success me-2"></i>
+                      <strong>Hours:</strong><br />
+                      <span class="ms-4">Mon-Fri: 8AM - 6PM</span>
+                    </li>
+                  </ul>
+
+                  <div class="mt-4">
+                    <a href="#" class="btn btn-primary w-100">
+                      <i class="fas fa-question-circle me-2"></i>FAQ Section
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-3 mt-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="mb-0">
+              &copy; 2024 Mushana Multipurpose Cooperative Society. All rights
+              reserved.
+            </p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#" class="text-light me-3">Privacy Policy</a>
+            <a href="#" class="text-light">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("sidebar");
+        const mainContent = document.getElementById("mainContent");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+
+        // Toggle sidebar on button click
+        sidebarToggle.addEventListener("click", function () {
+          sidebar.classList.toggle("show");
+        });
+
+        // Handle window resize
+        window.addEventListener("resize", function () {
+          if (window.innerWidth > 992) {
+            sidebar.classList.remove("show");
+          }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener("click", function (event) {
+          if (window.innerWidth <= 992) {
+            if (
+              !sidebar.contains(event.target) &&
+              !sidebarToggle.contains(event.target)
+            ) {
+              sidebar.classList.remove("show");
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

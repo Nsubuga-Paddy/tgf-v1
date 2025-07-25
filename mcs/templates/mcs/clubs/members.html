@@ -1,0 +1,228 @@
+{% extends 'mcs/clubs/base.html' %} {% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div
+    class="alert mb-4"
+    role="alert"
+    style="background: linear-gradient(45deg, #fd7e14, #e06c0c); color: white"
+  >
+    <div class="d-flex align-items-center">
+      <div class="flex-shrink-0">
+        <i class="fas fa-users fa-2x me-3"></i>
+      </div>
+      <div class="flex-grow-1">
+        <h4 class="alert-heading mb-1 text-white">
+          Welcome to {% if club and club.name %}{{ club.name }}{% else %}Club{% endif %}'s Members
+        </h4>
+        <p class="mb-0 text-white-50">
+          View and manage club members, administration, and member activities.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Statistics -->
+  <div class="row g-4 mb-4">
+    <!-- Total Members -->
+    <div class="col-md-4">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Total Members</h6>
+              <h2 class="card-title mb-0">{{ total_members }}</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-users fa-2x"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Active members: {{ active_members }}</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Contributors -->
+    <div class="col-md-4">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Active Contributors</h6>
+              <h2 class="card-title mb-0">{{ active_contributors }}</h2>
+            </div>
+            <div class="icon text-success">
+              <i class="fas fa-hand-holding-usd fa-2x"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">This month</small>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fixed Savings Members -->
+    <div class="col-md-4">
+      <div class="card bg-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-subtitle mb-2 text-muted">Fixed Savings</h6>
+              <h2 class="card-title mb-0">UGX {{ total_fixed_amount|floatformat:0 }}</h2>
+            </div>
+            <div class="icon text-primary">
+              <i class="fas fa-lock fa-2x"></i>
+            </div>
+          </div>
+          <p class="card-text mt-3 mb-0">
+            <small class="text-muted">Total amount fixed</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Club Administration -->
+  <div class="card bg-white mb-4">
+    <div class="card-header bg-transparent">
+      <h5 class="card-title mb-0">Club Administration</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-4">
+        <!-- Executive Committee -->
+        <div class="col-md-6">
+          <h6 class="text-muted mb-3">Executive Committee</h6>
+          <div class="list-group">
+            {% if executive_committee %}
+              {% for member in executive_committee %}
+              <div class="list-group-item">
+                <div
+                  class="d-flex w-100 justify-content-between align-items-center"
+                >
+                  <div>
+                    <h6 class="mb-1">{{ member.name }}</h6>
+                    <small class="text-muted">{{ member.role }}</small>
+                  </div>
+                  <div class="text-muted">
+                    <small>Since: {{ member.join_date }}</small>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="list-group-item text-center text-muted">
+                <p class="mb-0">No executive committee members found</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Committee Members -->
+        <div class="col-md-6">
+          <h6 class="text-muted mb-3">Committee Members</h6>
+          <div class="list-group">
+            {% if committee_members %}
+              {% for member in committee_members %}
+              <div class="list-group-item">
+                <div
+                  class="d-flex w-100 justify-content-between align-items-center"
+                >
+                  <div>
+                    <h6 class="mb-1">{{ member.name }}</h6>
+                    <small class="text-muted">{{ member.role }}</small>
+                  </div>
+                  <div class="text-muted">
+                    <small>Since: {{ member.join_date }}</small>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="list-group-item text-center text-muted">
+                <p class="mb-0">No committee members found</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members List -->
+  <div class="card bg-white">
+    <div
+      class="card-header bg-transparent d-flex justify-content-between align-items-center"
+    >
+      <h5 class="card-title mb-0">Members List</h5>
+      <div class="d-flex gap-2">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Search members..."
+          />
+          <button class="btn btn-outline-secondary btn-sm" type="button">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Member Acc No.</th>
+              <th>Name</th>
+              <th>Join Date</th>
+              <th>Status</th>
+              <th>Total Savings</th>
+              <th>Last Contribution</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if members_data %}
+              {% for member in members_data %}
+              <tr>
+                <td>{{ member.member_id }}</td>
+                <td>{{ member.name }}</td>
+                <td>{{ member.join_date }}</td>
+                <td>
+                  {% if member.status == 'Active' %}
+                    <span class="badge bg-success">{{ member.status }}</span>
+                  {% else %}
+                    <span class="badge bg-warning">{{ member.status }}</span>
+                  {% endif %}
+                </td>
+                <td>UGX {{ member.total_savings|floatformat:0 }}</td>
+                <td>{{ member.last_contribution }}</td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center text-muted">No members found</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Previous</a>
+          </li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+{% endblock %}
