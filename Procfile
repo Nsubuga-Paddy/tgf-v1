@@ -1,1 +1,1 @@
-web: gunicorn mcs_dashboards.wsgi --log-file -
+web: gunicorn mcs.wsgi --log-file -
