@@ -69,6 +69,7 @@ class SavingsTransaction(models.Model):
     remaining_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     class Meta:
+        db_table = "tgfs_savingstransaction"
         ordering = ['-date_saved']
         verbose_name = "52 WSC Savings Transaction"
         verbose_name_plural = "52 WSC Savings Transactions"
